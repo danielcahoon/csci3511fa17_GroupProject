@@ -1,0 +1,6 @@
+Lives: 7
+Guessed Letters
+abcdefghijklmnopqrs
+B _ N _ N _ _
+
+word: Bananas <- not shown but known by computer. Only first 4 lines on screen with that format.
