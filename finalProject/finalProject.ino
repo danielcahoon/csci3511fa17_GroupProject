@@ -53,12 +53,12 @@ void loop() {
   int choice = 0;
   mainMenuLineForArrow = menuButtonDetection(mainMenuLineForArrow, &choice);
   mainMenuLineForArrow %= 3;
-  writeMenu(mainMenuLineForArrow, previousLine);
   switch (choice) {
     case 1:
       lcd.clear();
       hangman();
       previousLine = -1;
+      mainMenuLineForArrow = 1;
       choice = 0;
       lcd.clear();
       break;
@@ -66,6 +66,7 @@ void loop() {
       lcd.clear();
       ticTacToe();
       previousLine = -1;
+      mainMenuLineForArrow = 1;
       choice = 0;
       lcd.clear();
       break;
@@ -73,13 +74,16 @@ void loop() {
       lcd.clear();
       matching();
       previousLine = -1;
+      mainMenuLineForArrow = 1;
       choice = 0;
       lcd.clear();
       break;
   }
+  writeMenu(mainMenuLineForArrow, previousLine);
   previousLine = mainMenuLineForArrow;
 }
 
+/* Menu Management
 //----------------------------------------------------------------------------------//
 //
 //                                   Menu Management
@@ -107,6 +111,7 @@ void loop() {
 //
 //
 //----------------------------------------------------------------------------------//
+*/
 
 // Main Menu
 int menuButtonDetection(int lineForArrow, int *choice) {
@@ -176,11 +181,8 @@ int getTTTGameType() {
   lcd.setCursor(1, 2);
   lcd.print("2. Player vs AI");
   while (digitalRead(ENTER_BUTTON)) {
-    if (prev != lineForArrow) {
-      lcd.setCursor(0, lineForArrow);
-      lcd.print(">");
-    }
     if (!digitalRead(UP_BUTTON)) {
+
       --lineForArrow;
       if (lineForArrow < 1) {
         lineForArrow = 1;
@@ -192,8 +194,15 @@ int getTTTGameType() {
         lineForArrow = 2;
       }
     }
+    if (prev != lineForArrow) {
+      lcd.setCursor(0, prev);
+      lcd.print(" ");
+      lcd.setCursor(0, lineForArrow);
+      lcd.print(">");
+    }
     prev = lineForArrow;
   }
+  delay(250);
   return lineForArrow;
 }
 
@@ -207,10 +216,7 @@ int getTTTPlayerOne() {
   lcd.setCursor(2, 2);
   lcd.print("Odd");
   while (digitalRead(ENTER_BUTTON)) {
-    if (prevLine != arrow) {
-      lcd.setCursor(0, arrow);
-      lcd.print(">");
-    }
+
     if (!digitalRead(UP_BUTTON)) {
       --arrow;
       if (arrow < 1) {
@@ -223,13 +229,53 @@ int getTTTPlayerOne() {
         arrow = 2;
       }
     }
-    Serial.print("prev = ");
-    Serial.println(prevLine);
-    Serial.print("curr = ");
-    Serial.println(arrow);
+    if (prevLine != arrow) {
+      lcd.setCursor(0, prevLine);
+      lcd.print(" ");
+      lcd.setCursor(0, arrow);
+      lcd.print(">");
+    }
     prevLine = arrow;
   }
+  delay(250);
   return arrow;
+}
+
+void printTTTWinner(int check) {
+  if (check == 1) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("  Congratulations!  ");
+      lcd.setCursor(0, 1);
+      lcd.print("********************");
+      lcd.setCursor(0, 2);
+      lcd.print("*  Player 1 Wins!  *");
+      lcd.setCursor(0, 3);
+      lcd.print("********************");
+      Serial.println("**********"), Serial.println("Player 1 Wins!"), Serial.println("**********");
+    } else if (check == 2) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("  Congratulations!  ");
+      lcd.setCursor(0, 1);
+      lcd.print("********************");
+      lcd.setCursor(0, 2);
+      lcd.print("*  Player 2 Wins!  *");
+      lcd.setCursor(0, 3);
+      lcd.print("********************");
+      Serial.println("**********"), Serial.println("Player 2 Wins!"), Serial.println("**********");
+    } else if (check == 3) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("  Congratulations!  ");
+      lcd.setCursor(0, 1);
+      lcd.print("********************");
+      lcd.setCursor(0, 2);
+      lcd.print("*     Tie Game     *");
+      lcd.setCursor(0, 3);
+      lcd.print("********************");
+      Serial.println("**********"), Serial.println("Tie Game!"), Serial.println("**********");
+    }
 }
 
 // Matching Game
@@ -273,6 +319,8 @@ void writeMatchingGameMenu(int lineForArrow, int prevLine) {
   lcd.setCursor(0, lineForArrow + 1);
   lcd.print(">");
 }
+
+/* Hangman
 //----------------------------------------------------------------------------------//
 //
 //                                        Hangman
@@ -280,6 +328,7 @@ void writeMatchingGameMenu(int lineForArrow, int prevLine) {
 // functions associated with the hangman game:
 //
 //----------------------------------------------------------------------------------//
+*/
 
 // lcd.noblink() and lcd.blink() to blink turn on blinking cursor for hangman
 // hangman is where the implementation for the hangman game logic is going to be put.
@@ -292,6 +341,7 @@ void hangman() {
   }
 }
 
+/* Tic Tac Toe
 //----------------------------------------------------------------------------------//
 //
 //                                     Tic Tac Toe
@@ -334,6 +384,7 @@ void hangman() {
 //                      it searches the whole board to see if it's a Cat's game.
 //   - printBoard()   | Prints the board to the screen.
 //----------------------------------------------------------------------------------//
+*/
 
 // ticTacToe is where the implementation for the Tic Tac Toe game logic is going to be put.
 // no arguments are passed to the function because everything that the function needs will
@@ -342,17 +393,16 @@ void ticTacToe() {
   // Variables specific to tic-tac-toe
   bool keepPlaying = true;
   int gameType = 1;
-  while (keepPlaying) {
-    // Code specific to show menu
-    gameType = getTTTGameType();
-    lcd.clear();
-    switch (gameType) {
-      case 1:
-        break;
-      case 2:
-        playGamePvC(getTTTPlayerOne());
-        break;
-    }
+
+  gameType = getTTTGameType();
+  lcd.clear();
+  switch (gameType) {
+    case 1:
+      playGamePvP(getTTTPlayerOne());
+      break;
+    case 2:
+      playGamePvC(getTTTPlayerOne());
+      break;
   }
 }
 
@@ -363,63 +413,72 @@ void ticTacToe() {
    then the Computer (who is O) goes first.
 */
 void playGamePvC(int numP) {
-  int numC = random(10), check = 0;
+  lcd.clear();
+  int numC = random(10), check = 0, turn = 9;
   char board[9] = {'_', '_', '_', '_', '_', '_', '_', '_', '_'};
 
   if ((((numC % 2) == 0) && ((numP % 2) == 0)) ||
       (((numC % 2) != 0) && ((numP % 2) != 0))) {
-    while (check == 0) {
+    while (turn > 0 && check == 0) {
       // Player's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       playerTurnX(board);
       delay(500);
-      printBoard(board);
-      delay(500);
       check = checkBoard(board);
+      --turn;
+      if (turn < 1 || check > 0) {
+        break;
+      }
 
       // Computer's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       compyTurnO(board);
       delay(500);
-      printBoard(board);
-      delay(500);
+      --turn;
       check = checkBoard(board);
     }
 
+    check = checkBoard(board);
+    Serial.print("check = ");
+    Serial.println(check);
     // Check who won and display it.
-    if (check == 1) {
-      Serial.println("**********"), Serial.println("Player 1(X) Wins!"), Serial.println("**********");
-    } else if (check == 2) {
-      Serial.println("**********"), Serial.println("Player 2(O) Wins!"), Serial.println("**********");
-    } else if (check == 3) {
-      Serial.println("**********"), Serial.println("Cat Wins!"), Serial.println("**********");
-    }
-    delay(3000);
+    printTTTWinner(check);
   } else if (((numC % 2) != 0) || ((numP % 2) != 0)) {
-    while (check == 0) {
+    while (turn > 0 && check == 0) {
       // Player's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       compyTurnX(board);
       delay(500);
-      printBoard(board);
-      delay(500);
       check = checkBoard(board);
+      --turn;
+      if (turn < 1 || check > 0) {
+        break;
+      }
+     
 
       // Computer's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       playerTurnO(board);
       delay(500);
-      printBoard(board);
-      delay(500);
+      --turn;
       check = checkBoard(board);
     }
 
+    check = checkBoard(board);
+    Serial.print("check = ");
+    Serial.println(check);
     // Check who won and display it.
-    if (check == 1) {
-      Serial.println("**********"), Serial.println("Player 2(O) Wins!"), Serial.println("**********");
-    } else if (check == 2) {
-      Serial.println("**********"), Serial.println("Player 1(X) Wins!"), Serial.println("**********");
-    } else if (check == 3) {
-      Serial.println("**********"), Serial.println("Cat Wins!"), Serial.println("**********");
-    }
-    delay(3000);
+    printTTTWinner(check);
   }
+  delay(3000);
 }
 
 /* Function to choose who goes first in PVP and play the
@@ -429,61 +488,62 @@ void playGamePvC(int numP) {
    then Player 2 (who is O) goes first.
 */
 void playGamePvP(int numP) {
-  int numC = random(10), check = 0;
+  int numC = random(10), check = 0, turn = 9;
   char board[9] = {'_', '_', '_', '_', '_', '_', '_', '_', '_'};
 
   if ((((numC % 2) == 0) && ((numP % 2) == 0)) ||
       (((numC % 2) != 0) && ((numP % 2) != 0))) {
-    while (check == 0) {
+    while (turn > 0 && check == 0) {
       // Player 1's turn, print the board, then check the board.
+      
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       playerTurnX(board);
       delay(500);
-      printBoard(board);
-      delay(500);
       check = checkBoard(board);
-
+      --turn;
+      if (turn < 1 || check > 0) {
+        break;
+      }
       // Player 2's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       playerTurnO(board);
       delay(500);
-      printBoard(board);
-      delay(500);
       check = checkBoard(board);
+      --turn;
     }
-
-    // Check who won and display it.
-    if (check == 1) {
-      Serial.println("**********"), Serial.println("Player 1(X) Wins!"), Serial.println("**********");
-    } else if (check == 2) {
-      Serial.println("**********"), Serial.println("Player 2(O) Wins!"), Serial.println("**********");
-    } else if (check == 3) {
-      Serial.println("**********"), Serial.println("Cat Wins!"), Serial.println("**********");
-    }
+    check = checkBoard(board);
+    printTTTWinner(check);
     delay(3000);
   } else if (((numC % 2) != 0) || ((numP % 2) != 0)) {
-    while (check == 0) {
+    while (turn > 0 && check == 0) {
       // Player 1's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       playerTurnO(board);
       delay(500);
-      printBoard(board);
-      delay(500);
       check = checkBoard(board);
-
+      --turn;
+      if (turn < 1 || check > 0) {
+        break;
+      }
       // Player 2's turn, print the board, then check the board.
+      check = checkBoard(board);
+      printBoard(board, turn);
+      delay(500);
       playerTurnX(board);
       delay(500);
-      printBoard(board);
-      delay(500);
       check = checkBoard(board);
+      --turn;
     }
 
     // Check who won and display it.
-    if (check == 1) {
-      Serial.println("**********"), Serial.println("Player 2(O) Wins!"), Serial.println("**********");
-    } else if (check == 2) {
-      Serial.println("**********"), Serial.println("Player 1(X) Wins!"), Serial.println("**********");
-    } else if (check == 3) {
-      Serial.println("**********"), Serial.println("Cat Wins!"), Serial.println("**********");
-    }
+    check = checkBoard(board);
+    printTTTWinner(check);
     delay(3000);
   }
 }
@@ -528,7 +588,7 @@ void compyTurnX (char brd[9]) {
 */
 void compyTurnO (char brd[9]) {
   int num = 0, ck = 0;
-
+  
   Serial.print("Compy Choice: ");
   while (ck == 0) {
     // Generate random number and print it.
@@ -689,25 +749,70 @@ int checkBoard (char brd[9]) {
 
 /* Function to print the board to the screen.
 */
-void printBoard (char brd[9]) {
+void printBoard (char brd[9], int turn) {
   int rowOfBoard = 1;
   int column = 0;
   for (int i = 0; i < 9; i++, column++) {
-    if (column == 2) {
-      column = 0;
-      ++rowOfBoard;
-      lcd.setCursor(6, rowOfBoard);
-      lcd.print("| ");
-      lcd.setCursor(8, rowOfBoard);
-      lcd.print(brd[i]);
-      lcd.setCursor(0, rowOfBoard);
-    }
+    //    if (column == 2) {
+    //      column = 0;
+    //      ++rowOfBoard;
+    //      lcd.setCursor(4, rowOfBoard);
+    //      lcd.print(brd[i]);
+    //      lcd.setCursor(0, rowOfBoard);
+    //    } else {
+    //      lcd.setCursor(2 * (i % 3), rowOfBoard);
+    //      lcd.print(brd[i]);
+    //      lcd.setCursor((2 * (i % 3)) + 1, rowOfBoard);
+    //      lcd.print("|");
+    //    }
     Serial.print(brd[i]);
     Serial.print(" ");
   }
   Serial.print("\n");
+  lcd.setCursor(0, 0);
+  lcd.print("Tic Tac Toe - Player vs Computer");
+  lcd.setCursor(0, rowOfBoard);
+  lcd.print(brd[0]);
+  lcd.setCursor(1, rowOfBoard);
+  lcd.print("|");
+  lcd.setCursor(2, rowOfBoard);
+  lcd.print(brd[1]);
+  lcd.setCursor(3, rowOfBoard);
+  lcd.print("|");
+  lcd.setCursor(4, rowOfBoard);
+  lcd.print(brd[2]);
+  lcd.setCursor(5, rowOfBoard);
+  ++rowOfBoard;
+  lcd.setCursor(0, rowOfBoard);
+  lcd.print(brd[3]);
+  lcd.setCursor(1, rowOfBoard);
+  lcd.print("|");
+  lcd.setCursor(2, rowOfBoard);
+  lcd.print(brd[4]);
+  lcd.setCursor(3, rowOfBoard);
+  lcd.print("|");
+  lcd.setCursor(4, rowOfBoard);
+  lcd.print(brd[5]);
+  lcd.setCursor(5, rowOfBoard);
+  ++rowOfBoard;
+  lcd.setCursor(0, rowOfBoard);
+  lcd.print(brd[6]);
+  lcd.setCursor(1, rowOfBoard);
+  lcd.print("|");
+  lcd.setCursor(2, rowOfBoard);
+  lcd.print(brd[7]);
+  lcd.setCursor(3, rowOfBoard);
+  lcd.print("|");
+  lcd.setCursor(4, rowOfBoard);
+  lcd.print(brd[8]);
+  lcd.setCursor(5, rowOfBoard);
+  lcd.setCursor(12, 3);
+  lcd.print("Turn: ");
+  lcd.setCursor(19, 3);
+  lcd.print(turn);
 }
 
+/* Matching Game
 //----------------------------------------------------------------------------------//
 //
 //                                     Matching Game
@@ -737,6 +842,7 @@ void printBoard (char brd[9]) {
 //   - getButton()        | This function will check to see which of the 5 buttons are
 //                          actively being pushed for the pattern.
 //----------------------------------------------------------------------------------//
+*/
 
 // matching is where the implementation for the matching game's logic is going to be put.
 // no arguments are passed to the function because everything that the function needs will
@@ -771,7 +877,7 @@ void matching() {
       lcd.print("Remaining Lives:   ");
       lcd.setCursor(19, 3);
       lcd.print(lives);
-      delay(2000);  
+      delay(2000);
     }
     stage++;
 
@@ -960,4 +1066,3 @@ int getButton() {
   }
   return -1; // -1 means no input received from user
 }
-
