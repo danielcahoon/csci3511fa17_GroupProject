@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
-#include <Keypad.h>
 
 const int LEFT_BUTTON = 12;
 const int LEFT_LED = 11;
@@ -69,6 +68,7 @@ void loop() {
       mainMenuLineForArrow = 1;
       choice = 0;
       lcd.clear();
+      lcd.noBlink();
       break;
     case 3:
       lcd.clear();
@@ -84,33 +84,33 @@ void loop() {
 }
 
 /* Menu Management
-//----------------------------------------------------------------------------------//
-//
-//                                   Menu Management
-//
-// functions associated with the hangman game:
-//   - writeMenu()            | This function writes the main menu to the lcd.
-//
-//   - menuButtonDetection()  | This function gets the input from the board and
-//                              moves the arrow on the lcd and if the enter is
-//                              pushed then the menu is changed to be the one
-//                              corresponding with the selection for where the
-//                              cursor is.
-//
-//   - writeHangmanMenu()     | This function writes out the "game board" of
-//                              the hangman game including lives, guessed letters
-//                              and the progress on the current word to guess.
-//
-//   - getTTTGameType()       | This function determines the game type of Tic Tac
-//                              Toe between the choice of Player vs Player or
-//                              Player vs Computer.
-//
-//   - getTTTPlayerOne()      | This function prompts the player to choose even or
-//                              odd. If the player chooses even it returns 2, if
-//                              they choose odd then it returns 1.
-//
-//
-//----------------------------------------------------------------------------------//
+  //----------------------------------------------------------------------------------//
+  //
+  //                                   Menu Management
+  //
+  // functions associated with the hangman game:
+  //   - writeMenu()            | This function writes the main menu to the lcd.
+  //
+  //   - menuButtonDetection()  | This function gets the input from the board and
+  //                              moves the arrow on the lcd and if the enter is
+  //                              pushed then the menu is changed to be the one
+  //                              corresponding with the selection for where the
+  //                              cursor is.
+  //
+  //   - writeHangmanMenu()     | This function writes out the "game board" of
+  //                              the hangman game including lives, guessed letters
+  //                              and the progress on the current word to guess.
+  //
+  //   - getTTTGameType()       | This function determines the game type of Tic Tac
+  //                              Toe between the choice of Player vs Player or
+  //                              Player vs Computer.
+  //
+  //   - getTTTPlayerOne()      | This function prompts the player to choose even or
+  //                              odd. If the player chooses even it returns 2, if
+  //                              they choose odd then it returns 1.
+  //
+  //
+  //----------------------------------------------------------------------------------//
 */
 
 // Main Menu
@@ -243,39 +243,39 @@ int getTTTPlayerOne() {
 
 void printTTTWinner(int check) {
   if (check == 1) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("  Congratulations!  ");
-      lcd.setCursor(0, 1);
-      lcd.print("********************");
-      lcd.setCursor(0, 2);
-      lcd.print("*  Player 1 Wins!  *");
-      lcd.setCursor(0, 3);
-      lcd.print("********************");
-      Serial.println("**********"), Serial.println("Player 1 Wins!"), Serial.println("**********");
-    } else if (check == 2) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("  Congratulations!  ");
-      lcd.setCursor(0, 1);
-      lcd.print("********************");
-      lcd.setCursor(0, 2);
-      lcd.print("*  Player 2 Wins!  *");
-      lcd.setCursor(0, 3);
-      lcd.print("********************");
-      Serial.println("**********"), Serial.println("Player 2 Wins!"), Serial.println("**********");
-    } else if (check == 3) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("  Congratulations!  ");
-      lcd.setCursor(0, 1);
-      lcd.print("********************");
-      lcd.setCursor(0, 2);
-      lcd.print("*     Tie Game     *");
-      lcd.setCursor(0, 3);
-      lcd.print("********************");
-      Serial.println("**********"), Serial.println("Tie Game!"), Serial.println("**********");
-    }
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("  Congratulations!  ");
+    lcd.setCursor(0, 1);
+    lcd.print("********************");
+    lcd.setCursor(0, 2);
+    lcd.print("*  Player 1 Wins!  *");
+    lcd.setCursor(0, 3);
+    lcd.print("********************");
+    Serial.println("**********"), Serial.println("Player 1 Wins!"), Serial.println("**********");
+  } else if (check == 2) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("  Congratulations!  ");
+    lcd.setCursor(0, 1);
+    lcd.print("********************");
+    lcd.setCursor(0, 2);
+    lcd.print("*  Player 2 Wins!  *");
+    lcd.setCursor(0, 3);
+    lcd.print("********************");
+    Serial.println("**********"), Serial.println("Player 2 Wins!"), Serial.println("**********");
+  } else if (check == 3) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("  Congratulations!  ");
+    lcd.setCursor(0, 1);
+    lcd.print("********************");
+    lcd.setCursor(0, 2);
+    lcd.print("*     Tie Game     *");
+    lcd.setCursor(0, 3);
+    lcd.print("********************");
+    Serial.println("**********"), Serial.println("Tie Game!"), Serial.println("**********");
+  }
 }
 
 // Matching Game
@@ -321,13 +321,13 @@ void writeMatchingGameMenu(int lineForArrow, int prevLine) {
 }
 
 /* Hangman
-//----------------------------------------------------------------------------------//
-//
-//                                        Hangman
-//
-// functions associated with the hangman game:
-//
-//----------------------------------------------------------------------------------//
+  //----------------------------------------------------------------------------------//
+  //
+  //                                        Hangman
+  //
+  // functions associated with the hangman game:
+  //
+  //----------------------------------------------------------------------------------//
 */
 
 // lcd.noblink() and lcd.blink() to blink turn on blinking cursor for hangman
@@ -335,55 +335,52 @@ void writeMatchingGameMenu(int lineForArrow, int prevLine) {
 // no arguments are passed to the function because everything that the function needs will
 // declared within the function.
 void hangman() {
-  // While loop is for testing purposes only to ensure menu functionality.
-  while (true) {
-    writeHangmanMenu(1, 7);
-  }
+
 }
 
 /* Tic Tac Toe
-//----------------------------------------------------------------------------------//
-//
-//                                     Tic Tac Toe
-//
-// functions associated with the tic tac toe:
-//
-//   - playGamePvC()  | Allows the user to play the game against a computer.
-//                      The user enters a number while the computer generates
-//                      a random number. If both numbers are even, the player
-//                      goes first. If they are different, the computer goes
-//                      first.
-//   - playGamePvP()  | Allows two users to play against eachother.
-//                      Player 1 enters a number while the computer generates
-//                      a random number. If both numbers are even, Player 1
-//                      goes first. If they are different, Player 2 goes
-//                      first.
-//   - compyTurnX()   | Allows the computer to play as X. It generates a random
-//                      number and checks the availability on the board. If it's
-//                      available, it marks the space with 'X'. If not, it
-//                      searches for another space that is until it finds one.
-//   - compyTurnO()   | Allows the computer to play as O. It generates a random
-//                      number and checks the availability on the board. If it's
-//                      available, it marks the space with 'O'. If not, it
-//                      searches for another space that is until it finds one.
-//   - playerTurnX()  | Allows the player to play as X. It prompts the player
-//                      for a number and checks the validity of the number.
-//                      If it passes, it will check if the board space is
-//                      available. If it is, it marks it with 'X'. If either
-//                      case is not true, it does nothing until the player
-//                      enters a valid/available number/space.
-//   - playerTurnO()  | Allows the player to play as O. It prompts the player
-//                      for a number and checks the validity of the number.
-//                      If it passes, it will check if the board space is
-//                      available. If it is, it marks it with 'O'. If either
-//                      case is not true, it does nothing until the player
-//                      enters a valid/available number/space.
-//   - checkBoard()   | Checks the board to see if anyone has won the game.
-//                      It loops through the horizontal and vertical spaces,
-//                      then searches the diagonals. If none of those win,
-//                      it searches the whole board to see if it's a Cat's game.
-//   - printBoard()   | Prints the board to the screen.
-//----------------------------------------------------------------------------------//
+  //----------------------------------------------------------------------------------//
+  //
+  //                                     Tic Tac Toe
+  //
+  // functions associated with the tic tac toe:
+  //
+  //   - playGamePvC()  | Allows the user to play the game against a computer.
+  //                      The user enters a number while the computer generates
+  //                      a random number. If both numbers are even, the player
+  //                      goes first. If they are different, the computer goes
+  //                      first.
+  //   - playGamePvP()  | Allows two users to play against eachother.
+  //                      Player 1 enters a number while the computer generates
+  //                      a random number. If both numbers are even, Player 1
+  //                      goes first. If they are different, Player 2 goes
+  //                      first.
+  //   - compyTurnX()   | Allows the computer to play as X. It generates a random
+  //                      number and checks the availability on the board. If it's
+  //                      available, it marks the space with 'X'. If not, it
+  //                      searches for another space that is until it finds one.
+  //   - compyTurnO()   | Allows the computer to play as O. It generates a random
+  //                      number and checks the availability on the board. If it's
+  //                      available, it marks the space with 'O'. If not, it
+  //                      searches for another space that is until it finds one.
+  //   - playerTurnX()  | Allows the player to play as X. It prompts the player
+  //                      for a number and checks the validity of the number.
+  //                      If it passes, it will check if the board space is
+  //                      available. If it is, it marks it with 'X'. If either
+  //                      case is not true, it does nothing until the player
+  //                      enters a valid/available number/space.
+  //   - playerTurnO()  | Allows the player to play as O. It prompts the player
+  //                      for a number and checks the validity of the number.
+  //                      If it passes, it will check if the board space is
+  //                      available. If it is, it marks it with 'O'. If either
+  //                      case is not true, it does nothing until the player
+  //                      enters a valid/available number/space.
+  //   - checkBoard()   | Checks the board to see if anyone has won the game.
+  //                      It loops through the horizontal and vertical spaces,
+  //                      then searches the diagonals. If none of those win,
+  //                      it searches the whole board to see if it's a Cat's game.
+  //   - printBoard()   | Prints the board to the screen.
+  //----------------------------------------------------------------------------------//
 */
 
 // ticTacToe is where the implementation for the Tic Tac Toe game logic is going to be put.
@@ -460,7 +457,7 @@ void playGamePvC(int numP) {
       if (turn < 1 || check > 0) {
         break;
       }
-     
+
 
       // Computer's turn, print the board, then check the board.
       check = checkBoard(board);
@@ -495,7 +492,7 @@ void playGamePvP(int numP) {
       (((numC % 2) != 0) && ((numP % 2) != 0))) {
     while (turn > 0 && check == 0) {
       // Player 1's turn, print the board, then check the board.
-      
+
       check = checkBoard(board);
       printBoard(board, turn);
       delay(500);
@@ -555,7 +552,9 @@ void playGamePvP(int numP) {
 */
 void compyTurnX (char brd[9]) {
   int num = 0, ck = 0;
-
+  lcd.setCursor(19, 2);
+  lcd.print("X");
+  lcd.setCursor(0,1);
   Serial.print("Compy Choice: ");
   while (ck == 0) {
     // Generate random number and print it.
@@ -588,6 +587,9 @@ void compyTurnX (char brd[9]) {
 */
 void compyTurnO (char brd[9]) {
   int num = 0, ck = 0;
+  lcd.setCursor(19, 2);
+  lcd.print("0");
+  lcd.setCursor(0,1);
   
   Serial.print("Compy Choice: ");
   while (ck == 0) {
@@ -622,36 +624,73 @@ void compyTurnO (char brd[9]) {
     player to enter another number and checks it.
 */
 void playerTurnX (char brd[9]) {
-  char choice = 0;
+  lcd.setCursor(19, 2);
+  lcd.print("X");
+  lcd.setCursor(0,1);
   int check = 0, c;
-
+  int button = 0;
+  int columns[] = {0, 2, 4};
+  int column = 0;
+  int row = 1;
   // Prompts the user for a number from 1 or 9.
-  Serial.print("Turn (1-9):");
-  while (Serial.available() == 0) {}
-  choice = Serial.read();
-  c = (int)choice - 49;
-  Serial.println(choice);
+  c = -1;
 
   // Check if the choice is valid
   while (check == 0) {
+    button = getButton();
+    switch (button) {
+      case -1:
+        Serial.print("position = "), Serial.println((row - 1) + column);
+        lcd.setCursor(columns[column], row);
+        lcd.blink();
+        break;
+      case 0:
+        --column;
+        if (column < 0) {
+          column = 2;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 1:
+        --row;
+        if (row < 1) {
+          row = 3;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 2:
+        ++row;
+        if (row > 3) {
+          row = 1;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 3:
+        ++column;
+        if (column > 2) {
+          column = 0;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 4:
+        lcd.setCursor(columns[column], row);
+        c = (3 * (row - 1)) + column;
+        Serial.println((row - 1) + column);
+        break;
+    }
     // If it is, mark the space as 'X' and move on.
+    if (c == -1) {
+      continue;
+    }
     if ((c >= 0) && (c < 9)) {
       if ((brd[c] != 'O') && (brd[c] != 'X')) {
         brd[c] = 'X';
         check = 1;
       } else {
         // If it is not a valid number, have them enter another number.
-        while (Serial.available() == 0) {}
-        choice = Serial.read();
-        c = (int)choice - 49;
+        c = -1;
         check = 0;
       }
-    } else {
-      // If it is not a valid number, have them enter another number.
-      while (Serial.available() == 0) {}
-      choice = Serial.read();
-      c = (int)choice - 49;
-      check = 0;
     }
   }
 }
@@ -664,18 +703,64 @@ void playerTurnX (char brd[9]) {
     player to enter another number and checks it.
 */
 void playerTurnO (char brd[9]) {
-  char choice = 0;
+  lcd.setCursor(19, 2);
+  lcd.print("O");
+  lcd.setCursor(0,1);
   int check = 0, c;
-
+  int button = 0;
+  int columns[] = {0, 2, 4};
+  int column = 0;
+  int row = 1;
   // Prompts the user for a number from 1 or 9.
-  Serial.print("Turn (1-9):");
-  while (Serial.available() == 0) {}
-  choice = Serial.read();
-  c = (int)choice - 49;
-  Serial.println(choice);
+  c = -1;
 
   // Check if the choice is valid
   while (check == 0) {
+    button = getButton();
+    switch (button) {
+      case -1:
+        Serial.print("position = "), Serial.println((row - 1) + column);
+        lcd.setCursor(columns[column], row);
+        lcd.blink();
+        break;
+      case 0:
+        --column;
+        if (column < 0) {
+          column = 2;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 1:
+        --row;
+        if (row < 1) {
+          row = 3;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 2:
+        ++row;
+        if (row > 3) {
+          row = 1;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 3:
+        ++column;
+        if (column > 2) {
+          column = 0;
+        }
+        lcd.setCursor(columns[column], row);
+        break;
+      case 4:
+        lcd.setCursor(columns[column], row);
+        c = (3 * (row - 1)) + column;
+        Serial.println((row - 1) + column);
+        break;
+    }
+    // If it is, mark the space as 'X' and move on.
+    if (c == -1) {
+      continue;
+    }
     // If it is, mark the space as 'X' and move on.
     if ((c >= 0) && (c < 9)) {
       if ((brd[c] != 'O') && (brd[c] != 'X')) {
@@ -684,16 +769,9 @@ void playerTurnO (char brd[9]) {
       } else {
         // If it is not a valid number, have them enter another number.
         while (Serial.available() == 0) {}
-        choice = Serial.read();
-        c = (int)choice - 49;
+        c = -1;
         check = 0;
       }
-    } else {
-      // If it is not a valid number, have them enter another number.
-      while (Serial.available() == 0) {}
-      choice = Serial.read();
-      c = (int)choice - 49;
-      check = 0;
     }
   }
 }
@@ -750,98 +828,69 @@ int checkBoard (char brd[9]) {
 /* Function to print the board to the screen.
 */
 void printBoard (char brd[9], int turn) {
+  lcd.clear();
   int rowOfBoard = 1;
-  int column = 0;
-  for (int i = 0; i < 9; i++, column++) {
-    //    if (column == 2) {
-    //      column = 0;
-    //      ++rowOfBoard;
-    //      lcd.setCursor(4, rowOfBoard);
-    //      lcd.print(brd[i]);
-    //      lcd.setCursor(0, rowOfBoard);
-    //    } else {
-    //      lcd.setCursor(2 * (i % 3), rowOfBoard);
-    //      lcd.print(brd[i]);
-    //      lcd.setCursor((2 * (i % 3)) + 1, rowOfBoard);
-    //      lcd.print("|");
-    //    }
+  for (int i = 0; i < 9; i++) {
     Serial.print(brd[i]);
     Serial.print(" ");
   }
   Serial.print("\n");
   lcd.setCursor(0, 0);
-  lcd.print("Tic Tac Toe - Player vs Computer");
-  lcd.setCursor(0, rowOfBoard);
-  lcd.print(brd[0]);
-  lcd.setCursor(1, rowOfBoard);
-  lcd.print("|");
-  lcd.setCursor(2, rowOfBoard);
-  lcd.print(brd[1]);
-  lcd.setCursor(3, rowOfBoard);
-  lcd.print("|");
-  lcd.setCursor(4, rowOfBoard);
-  lcd.print(brd[2]);
+  lcd.print("Tic Tac Toe");
+  lcd.setCursor(0, rowOfBoard), lcd.print(brd[0]);
+  lcd.setCursor(1, rowOfBoard), lcd.print("|");
+  lcd.setCursor(2, rowOfBoard), lcd.print(brd[1]);
+  lcd.setCursor(3, rowOfBoard), lcd.print("|");
+  lcd.setCursor(4, rowOfBoard), lcd.print(brd[2]);
   lcd.setCursor(5, rowOfBoard);
   ++rowOfBoard;
-  lcd.setCursor(0, rowOfBoard);
-  lcd.print(brd[3]);
-  lcd.setCursor(1, rowOfBoard);
-  lcd.print("|");
-  lcd.setCursor(2, rowOfBoard);
-  lcd.print(brd[4]);
-  lcd.setCursor(3, rowOfBoard);
-  lcd.print("|");
-  lcd.setCursor(4, rowOfBoard);
-  lcd.print(brd[5]);
+  lcd.setCursor(0, rowOfBoard), lcd.print(brd[3]);
+  lcd.setCursor(1, rowOfBoard), lcd.print("|");
+  lcd.setCursor(2, rowOfBoard), lcd.print(brd[4]);
+  lcd.setCursor(3, rowOfBoard), lcd.print("|");
+  lcd.setCursor(4, rowOfBoard), lcd.print(brd[5]);
   lcd.setCursor(5, rowOfBoard);
   ++rowOfBoard;
-  lcd.setCursor(0, rowOfBoard);
-  lcd.print(brd[6]);
-  lcd.setCursor(1, rowOfBoard);
-  lcd.print("|");
-  lcd.setCursor(2, rowOfBoard);
-  lcd.print(brd[7]);
-  lcd.setCursor(3, rowOfBoard);
-  lcd.print("|");
-  lcd.setCursor(4, rowOfBoard);
-  lcd.print(brd[8]);
+  lcd.setCursor(0, rowOfBoard), lcd.print(brd[6]);
+  lcd.setCursor(1, rowOfBoard), lcd.print("|");
+  lcd.setCursor(2, rowOfBoard), lcd.print(brd[7]);
+  lcd.setCursor(3, rowOfBoard), lcd.print("|");
+  lcd.setCursor(4, rowOfBoard), lcd.print(brd[8]);
   lcd.setCursor(5, rowOfBoard);
-  lcd.setCursor(12, 3);
-  lcd.print("Turn: ");
-  lcd.setCursor(19, 3);
-  lcd.print(turn);
+  lcd.setCursor(10, 2), lcd.print("Player: ");
+  lcd.setCursor(12, 3),lcd.print("Turn: "), lcd.setCursor(19, 3), lcd.print(turn);
 }
 
 /* Matching Game
-//----------------------------------------------------------------------------------//
-//
-//                                     Matching Game
-//
-// functions associated with the matching game:
-//   - matching()         | Mainly focuses on the creation of the light pattern as
-//                          well as controlling game difficulty.
-//   - promptPlayer()     | This function is designed to just be putting out a
-//                          prompt to the user asking if they are ready to play.
-//                          If they are not ready to play then they will be taken
-//                          back to the main menu. Other information to be printed
-//                          to the screen include the stage number, remaining tries
-//                          and the difficulty chosen.
-//   - playMatchingGame() | This is the function that controls the main game logic
-//                          regarding a winning message to be printed to the user
-//                          after completing all stages, manages the players lives
-//                          and handles to output from promptPlayer() to exit the
-//                          game if the player chooses to do so.
-//   - playLightPattern() | This function will loop through the lights to show the
-//                          pattern to the player that they will then need to copy.
-//   - verifyMatch()      | This function is designed to be called within
-//                          playMatchingGame to get the user's attempt to match the
-//                          pattern that was displayed to them from playLightPattern()
-//   - fillPattern()      | This function's purpose is to take in an argument pattern
-//                          and fill it with a random value from 1-5(i.e. 0, 1, 2, 3, 4)
-//                          to ensure a random version every time someone plays a game.
-//   - getButton()        | This function will check to see which of the 5 buttons are
-//                          actively being pushed for the pattern.
-//----------------------------------------------------------------------------------//
+  //----------------------------------------------------------------------------------//
+  //
+  //                                     Matching Game
+  //
+  // functions associated with the matching game:
+  //   - matching()         | Mainly focuses on the creation of the light pattern as
+  //                          well as controlling game difficulty.
+  //   - promptPlayer()     | This function is designed to just be putting out a
+  //                          prompt to the user asking if they are ready to play.
+  //                          If they are not ready to play then they will be taken
+  //                          back to the main menu. Other information to be printed
+  //                          to the screen include the stage number, remaining tries
+  //                          and the difficulty chosen.
+  //   - playMatchingGame() | This is the function that controls the main game logic
+  //                          regarding a winning message to be printed to the user
+  //                          after completing all stages, manages the players lives
+  //                          and handles to output from promptPlayer() to exit the
+  //                          game if the player chooses to do so.
+  //   - playLightPattern() | This function will loop through the lights to show the
+  //                          pattern to the player that they will then need to copy.
+  //   - verifyMatch()      | This function is designed to be called within
+  //                          playMatchingGame to get the user's attempt to match the
+  //                          pattern that was displayed to them from playLightPattern()
+  //   - fillPattern()      | This function's purpose is to take in an argument pattern
+  //                          and fill it with a random value from 1-5(i.e. 0, 1, 2, 3, 4)
+  //                          to ensure a random version every time someone plays a game.
+  //   - getButton()        | This function will check to see which of the 5 buttons are
+  //                          actively being pushed for the pattern.
+  //----------------------------------------------------------------------------------//
 */
 
 // matching is where the implementation for the matching game's logic is going to be put.
