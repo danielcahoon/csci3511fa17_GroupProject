@@ -21,6 +21,39 @@ const int LED_ARRAY[] = {LEFT_LED, UP_LED, DOWN_LED, RIGHT_LED, ENTER_LED};
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 
+// Hangman variables
+const char *arrQuestions[] = {"What never asks questions but is often answered?",
+                              "What belongs to you but other people use it more than you?",
+                              "What invention lets you look right through a wall?",
+                              "I’m tall when I’m young and I’m short when I’m old. What am I?",
+                              "What has hands but can not clap?",
+                              "What gets wetter and wetter the more it dries?",
+                              "How many days of the week that start with the letter 't'?",
+                              "Which months has 28 days?",
+                              "Give me food I will live give me water I will die. What am I?",
+                              "What can you hold without ever touch in or using your hands?"
+                             };
+const char *arrAnswer[] = {"DOORBELL",
+                           "YOUR NAME",
+                           "WINDOW",
+                           "CANDLE",
+                           "CLOCK",
+                           "TOWEL",
+                           "FOUR",
+                           "ALL MONTHS",
+                           "FIRE",
+                           "YOUR BREATH"
+                          };
+const int answerLength[10] = {8, 9, 6, 6, 5, 5, 4, 10, 4, 11};
+
+char *answerHG;
+int randNumHG;  //random number to pickout questions
+int lengthAnswerHG;   // keep length of the answer
+char guessCharHG;   //keep guessing character
+char previousGuessHG = '@'; // @ is an unset value for previousGuessHG
+bool doneGameHG = false;   //flag for game  - game is done when flag=true
+int livesHG = 7;    // lives
+
 // Menu variables
 int mainMenuLineForArrow = 0;
 int previousLine = -1; // -1 symbolizes a unset value for previousLine
@@ -50,14 +83,16 @@ void setup() {
 
 void loop() {
   int choice = 0;
+  bool win = false;
   mainMenuLineForArrow = menuButtonDetection(mainMenuLineForArrow, &choice);
   mainMenuLineForArrow %= 3;
   switch (choice) {
     case 1:
       lcd.clear();
-      hangman();
+      win = hangman();
+      writeHangmanEnd(win);
       previousLine = -1;
-      mainMenuLineForArrow = 1;
+      mainMenuLineForArrow = 0;
       choice = 0;
       lcd.clear();
       break;
@@ -65,7 +100,7 @@ void loop() {
       lcd.clear();
       ticTacToe();
       previousLine = -1;
-      mainMenuLineForArrow = 1;
+      mainMenuLineForArrow = 0;
       choice = 0;
       lcd.clear();
       lcd.noBlink();
@@ -74,7 +109,7 @@ void loop() {
       lcd.clear();
       matching();
       previousLine = -1;
-      mainMenuLineForArrow = 1;
+      mainMenuLineForArrow = 0;
       choice = 0;
       lcd.clear();
       break;
@@ -97,9 +132,8 @@ void loop() {
   //                              corresponding with the selection for where the
   //                              cursor is.
   //
-  //   - writeHangmanMenu()     | This function writes out the "game board" of
-  //                              the hangman game including lives, guessed letters
-  //                              and the progress on the current word to guess.
+  //   - writeHangmanEnd()      | This function writes out You Win! or Game Over! 
+  //                              depending on the status of the game.
   //
   //   - getTTTGameType()       | This function determines the game type of Tic Tac
   //                              Toe between the choice of Player vs Player or
@@ -109,7 +143,9 @@ void loop() {
   //                              odd. If the player chooses even it returns 2, if
   //                              they choose odd then it returns 1.
   //
-  //
+  //   - printTTTWinner()       | This function prints out the winner of the game of 
+  //                              Tic Tac Toe, or states that there is a tie if one
+  //                              occurs.
   //----------------------------------------------------------------------------------//
 */
 
@@ -157,17 +193,17 @@ void writeMenu(int lineForArrow, int prevLine) {
 }
 
 // Hangman
-void writeHangmanMenu(int lineForArrow, int lives) {//, char* guessedLetters, char* guessingWord) {
-  lcd.setCursor(0, 0);
-  lcd.print("Lives: ");
-  lcd.setCursor(7, 0);
-  lcd.print(lives);
-  lcd.setCursor(0, 1);
-  lcd.print("Guessed Letters");
-  lcd.setCursor(0, 2);
-  //  lcd.print(guessedLetters);
-  lcd.setCursor(0, 3);
-  //  lcd.print(guessingWord);
+void writeHangmanEnd(bool win) {
+  if (win) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("      YOU WIN!      ");
+  } else {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("     GAME OVER!     ");
+  }
+  delay(2000);
 }
 
 // Tic Tac Toe
@@ -326,18 +362,123 @@ void writeMatchingGameMenu(int lineForArrow, int prevLine) {
   //                                        Hangman
   //
   // functions associated with the hangman game:
-  //
+  //    - hangman() | This function is the main function of the game. It will display random
+  //                  questions on the LCD for user, and the ammount of underline respectively
+  //                  the number of character in the answers. It will store the characters
+  //                  which is entered by user into a temp array and then compare it to
+  //                  correct answer. It also has responsibility to notice user when
+  //                  user is out of lives or user got the correct answer and the game
+  //                  is over.
+  //    - printArr()| Display string to LCD 20x4 monitor
+  //    - getChar() | Allows user to use keyboard to enter a character from keyboard, and
+  //                  it will read every letter which is entered from the keyboard by user.
+  //                  Also, user can enter either lowercase or uppercase, the program will
+  //                  convert every character to uppcase letter. It will alert user if user
+  //                  enter more than one character.
+  //    - checkArr()| This function will check every guessed character which is entered by user
+  //                  on the keyboard. If the guessed character is incorrect, the function
+  //                  will minus user's lives and give the user remaining chances to finish
+  //                  the game. If the user got all right characters or out of lives,
+  //                  the game will end.
   //----------------------------------------------------------------------------------//
 */
 
-// lcd.noblink() and lcd.blink() to blink turn on blinking cursor for hangman
-// hangman is where the implementation for the hangman game logic is going to be put.
-// no arguments are passed to the function because everything that the function needs will
-// declared within the function.
-void hangman() {
+bool hangman() {
+  randNumHG = random(10);
+  Serial.println(arrQuestions[randNumHG]);
+  lengthAnswerHG = answerLength[randNumHG]; //get length of the answer
+  answerHG = new char[lengthAnswerHG];
+  for (int i = 0; i < lengthAnswerHG; ++i) {
+    answerHG[i] = '_';
+  }
+  Serial.print("length = "), Serial.println(lengthAnswerHG);
+  Serial.print("answer: "), Serial.println(answerHG);
+  //print out lives
+  Serial.print("Lives: ");
+  Serial.println(livesHG);
+  lcd.setCursor(0, 0);
+  lcd.print("Hangman");
+  lcd.setCursor(0, 1);
+  lcd.print("Lives: ");
+  lcd.setCursor(8, 1);
+  lcd.print(livesHG);
+  while (livesHG != 0 && doneGameHG == false)
+  {
 
+    Serial.print("Lives: ");
+    Serial.println(livesHG);
+    lcd.setCursor(0, 1);
+    lcd.print("Lives: ");
+    lcd.setCursor(8, 1);
+    lcd.print(livesHG);
+    printArr(answerHG, lengthAnswerHG);
+    guessCharHG = getChar();
+    if (!isAlpha(guessCharHG) || previousGuessHG == guessCharHG) {
+      continue;
+    }
+    checkArr(guessCharHG, answerHG, livesHG, doneGameHG, lengthAnswerHG);
+    printArr(answerHG, lengthAnswerHG);
+    Serial.print("\n");
+    previousGuessHG = guessCharHG;
+  }
+  printArr(answerHG, lengthAnswerHG);
+  if (livesHG == 0) {
+    Serial.println("Game Over");
+    return false;
+  }
+  if (doneGameHG == true) {
+    Serial.println("You Win");
+    return true;
+  }
 }
 
+void printArr(char *answer1HG, int ansLengthHG) {
+  for (int i = 0; i < ansLengthHG; ++i) {
+    Serial.print(answer1HG[i]);
+    Serial.print(' ');
+    lcd.setCursor(i, 3);
+    lcd.print(answer1HG[i]);
+  }
+  Serial.print("\n");
+}
+
+char getChar() {
+  char letterHG;
+  while (Serial.available() == 0) {}
+  letterHG = Serial.read();
+  Serial.print("letterHG = "), Serial.println(letterHG);
+  toupper(letterHG);
+  return letterHG;
+}
+
+void checkArr(char guessChar1HG, char *answer2HG, int &tempLivesHG, bool &tempDoneGameHG, int ansLengthHG) {
+  char *tmpHG = arrAnswer[randNumHG];
+  bool matchHG = false;
+  int CheckDoneGameHG = 0;
+  for (int i = 0; i < ansLengthHG; i++)
+  {
+    if (guessChar1HG == tmpHG[i])
+    {
+      matchHG = true;
+      answer2HG[i] = guessChar1HG;
+    }
+  }
+  if (matchHG == false) {
+    --tempLivesHG;
+  }
+  for (int j = 0; j < ansLengthHG; j++)
+  {
+    if (answer2HG[j] != tmpHG[j])
+    {
+      ++CheckDoneGameHG;
+    }
+  }
+  if (CheckDoneGameHG == 0) {
+    tempDoneGameHG = true;
+  } else {
+    tempDoneGameHG = false;
+  }
+}
 /* Tic Tac Toe
   //----------------------------------------------------------------------------------//
   //
@@ -554,7 +695,7 @@ void compyTurnX (char brd[9]) {
   int num = 0, ck = 0;
   lcd.setCursor(19, 2);
   lcd.print("X");
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   Serial.print("Compy Choice: ");
   while (ck == 0) {
     // Generate random number and print it.
@@ -589,8 +730,8 @@ void compyTurnO (char brd[9]) {
   int num = 0, ck = 0;
   lcd.setCursor(19, 2);
   lcd.print("0");
-  lcd.setCursor(0,1);
-  
+  lcd.setCursor(0, 1);
+
   Serial.print("Compy Choice: ");
   while (ck == 0) {
     // Generate random number and print it.
@@ -626,7 +767,7 @@ void compyTurnO (char brd[9]) {
 void playerTurnX (char brd[9]) {
   lcd.setCursor(19, 2);
   lcd.print("X");
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   int check = 0, c;
   int button = 0;
   int columns[] = {0, 2, 4};
@@ -705,7 +846,7 @@ void playerTurnX (char brd[9]) {
 void playerTurnO (char brd[9]) {
   lcd.setCursor(19, 2);
   lcd.print("O");
-  lcd.setCursor(0,1);
+  lcd.setCursor(0, 1);
   int check = 0, c;
   int button = 0;
   int columns[] = {0, 2, 4};
@@ -858,7 +999,7 @@ void printBoard (char brd[9], int turn) {
   lcd.setCursor(4, rowOfBoard), lcd.print(brd[8]);
   lcd.setCursor(5, rowOfBoard);
   lcd.setCursor(10, 2), lcd.print("Player: ");
-  lcd.setCursor(12, 3),lcd.print("Turn: "), lcd.setCursor(19, 3), lcd.print(turn);
+  lcd.setCursor(12, 3), lcd.print("Turn: "), lcd.setCursor(19, 3), lcd.print(turn);
 }
 
 /* Matching Game
